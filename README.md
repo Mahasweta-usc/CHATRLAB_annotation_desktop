@@ -18,6 +18,6 @@ Annotator launches with initial window to ask user details to keep track of anno
 Dashboard has options to browse, delete, skip, and label polarity and misinformation content of posts.
 Textbox displays caption, image-text rendering and image tags obtained using Google vision API
 Counter to track number of misinformation posts detected
-Skip images irrelevant to content, not confident of annotation or with a mismatch between actual image-text and rendered image-text
+Delete images irrelevant to content,skip if not confident of apt label or content has a mismatch between actual image-text and rendered image-text/image object labels
 Deleted images are stored in a separete bucket and can be retrieved as necessary. 
 
