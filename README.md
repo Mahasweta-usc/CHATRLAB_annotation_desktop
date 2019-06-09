@@ -5,12 +5,12 @@ Data visualizer for browsing/annotation for Instagram Vaccination Misinformation
 ## Getting Started
 
 Download all the files.
-Run the Installer.
 Execute bash script mac-setup.command by clicking icon and chosing to run in Terminal. Alternatively open a Terminal, change to application directory, and type ./mac-setup.sh
 
 ### Prerequisites
 
-Install Python 3.7.3 here https://www.python.org/ftp/python/3.7.3/python-3.7.3-macosx10.6.pkg (64/32 bit installer for Mac OSX) or https://www.python.org/ftp/python/3.7.3/python-3.7.3-macosx10.9.pkg (64 bit installer OSX)
+Install Python 3.7.3 here https://www.python.org/ftp/python/3.7.3/python-3.7.3-macosx10.6.pkg (64/32 bit installer for Mac OSX) or https://www.python.org/ftp/python/3.7.3/python-3.7.3-macosx10.9.pkg (64 bit installer OSX). 
+Run the Installer.
 
 ### Usage
 
