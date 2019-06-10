@@ -14,6 +14,7 @@ Run the Installer.
 
 ### Usage
 
+Running internet connection required through out.
 Annotator launches with initial window to ask user details to keep track of annotators and jobs. Do not leave blank. 
 Dashboard has options to browse, delete, skip, and label polarity and misinformation content of posts.
 Textbox displays caption, image-text rendering and image tags obtained using Google vision API
