@@ -4,7 +4,7 @@ Data visualizer for browsing/annotation for Instagram Vaccination Misinformation
 
 ## Getting Started
 
-Download all the files.
+Download all the files.Extract the folder. 
 Execute bash script mac-setup.command by clicking icon and chosing to run in Terminal. Alternatively open a Terminal, change to application directory, and type ./mac-setup.command
 
 ### Prerequisites
