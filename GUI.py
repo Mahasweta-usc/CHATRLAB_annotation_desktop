@@ -88,6 +88,13 @@ def delete_blob(blob_name, bucket_name = "project_vaxx"):
 	name = "xxx-" + blob_name
 	blob = bucket_t.rename_blob(blob, name)
 
+def skip_blob(blob_name, bucket_name = "project_vaxx"):
+	bucket_t = storage_client.bucket(bucket_name, user_project=None)
+	temp = storage.Blob(blob_name, bucket_t)
+	# # print('Blob {} deleted.'.format(temp))
+	blob = bucket.blob(blob_name)
+	name = "yyy-" + blob_name
+	blob = bucket_t.rename_blob(blob, name)
 
 class API():
 
@@ -107,18 +114,29 @@ class API():
 		Ans1 = True
 
 	def provaxx(self):
-		self.pro.config(state=DISABLED)
-		self.anti.config(state="normal")
 		global Polarity, Ans2
-		Polarity = 0
-		Ans2 = True
-
-	def antivaxx(self):
-		global polarity, Ans2
-		self.pro.config(state="normal")
-		self.anti.config(state=DISABLED)
 		Polarity = 1
 		Ans2 = True
+		self.pro.config(state=DISABLED)
+		self.anti.config(state="normal")
+		self.neutral.config(state="normal")
+
+	def antivaxx(self):
+		global Polarity, Ans2
+		Polarity = -1
+		Ans2 = True
+		self.pro.config(state="normal")
+		self.anti.config(state=DISABLED)
+		self.neutral.config(state="normal")
+
+	def neutral(self):
+		global Polarity, Ans2
+		Polarity = 0
+		print("polarity")
+		Ans2 = True
+		self.pro.config(state="normal")
+		self.neutral.config(state=DISABLED)
+		self.anti.config(state="normal")
 
 	def count(self):
 
@@ -127,7 +145,7 @@ class API():
 		self.false.config(state="normal")
 		self.pro.config(state="normal")
 		self.anti.config(state="normal")
-
+		self.neutral.config(state="normal")
 		# download_blob("record.json","temp2.json")
 		with open("temp2.json",'r') as input:
 			data = json.load(input)
@@ -167,7 +185,9 @@ class API():
 			self.false.config(state="normal")
 			self.pro.config(state="normal")
 			self.anti.config(state="normal")
+			self.neutral.config(state="normal")
 			self.count()
+			upload_blob("temp2.json","record.json","project_vaxx")
 			self.Update()
 
 
@@ -175,11 +195,23 @@ class API():
 			pass
 	  
 
-	def clicked_skip(self):
+	def clicked_next(self):
 		self.true.config(state="normal")
 		self.false.config(state="normal")
 		self.pro.config(state="normal")
 		self.anti.config(state="normal")
+		self.Update()
+
+	def clicked_skip(self):
+		global blobs
+		self.true.config(state="normal")
+		self.false.config(state="normal")
+		self.pro.config(state="normal")
+		self.anti.config(state="normal")
+
+		file_skip = self.blob.name
+
+		skip_blob(file_skip)
 		self.Update()
 
 	def clicked_delete(self):
@@ -245,6 +277,7 @@ class API():
 			URL = url
 			# print(URL)
 			try:
+				
 				raw_data = urllib2.urlopen(URL, timeout=60, verify=False).read()
 			except:
 				raw_data = urllib2.urlopen(URL, timeout=60, cafile=certifi.where()).read()
@@ -263,6 +296,7 @@ class API():
 			# self.text2.insert(END,'\n')
 			self.text2.insert(END,text)
 			self.text2.config(state=DISABLED)
+
 		except:
 			self.Update()
 
@@ -320,6 +354,10 @@ class API():
 
 		self.anti.grid(row=1,column=4, padx=(int(20*new_w),int(5*new_w)), pady=(int(5*new_h),int(5*new_h)),columnspan=1,sticky=S+E+W)
 
+		self.neutral = Button(self.frame, text="Neutral", command=self.neutral, highlightbackground='blue',anchor=CENTER,highlightcolor='white')
+
+		self.neutral.grid(row=1,column=5, padx=(int(5*new_w),int(5*new_w)), pady=(int(5*new_h),int(5*new_h)),columnspan=1,sticky=S+E+W)
+
 		self.pro = Button(self.frame, text="Pro", command=self.provaxx, highlightbackground='green',anchor=CENTER,highlightcolor='white')
 
 		self.pro.grid(row=1,column=6, padx=(int(5*new_w),int(30*new_w)), pady=(int(5*new_h),int(5*new_h)),columnspan=1,sticky=S+E+W)
@@ -341,6 +379,9 @@ class API():
 
 		submit = Button(self.frame, text=" Submit ", command=self.submit, highlightbackground='#3E4149',anchor=CENTER)
 		submit.grid(row=4,column=5, columnspan = 1, padx=(int(20*new_w),int(20*new_w)),pady=(int(20*new_h),int(20*new_h)))
+
+		forward = Button(self.frame, text=" Next ", command=self.clicked_next, highlightbackground='#3E4149',anchor=CENTER)
+		forward.grid(row=6,column=5, columnspan = 1, padx=(int(20*new_w),int(20*new_w)),pady=(int(20*new_h),int(20*new_h)))
 		
 
 		skip = Button(self.frame, text=" Skip ", command=self.clicked_skip, highlightbackground='#3E4149',anchor=W)
