@@ -56,8 +56,8 @@ p = shabnam(Query)
 Query.protocol("WM_DELETE_WINDOW", on_closing_entry)	
 Query.mainloop()
 
-MisInf, Polarity =  1,1
-Ans1, Ans2 = False, False
+MisInf, Polarity, tag =  1,1,0
+Ans1, Ans2, Ans3 = False, False, False
 
 storage_client = storage.Client.create_anonymous_client()
 bucket = storage_client.bucket(bucket_name="project_vaxx",user_project=None)
@@ -132,11 +132,24 @@ class API():
 	def neutral(self):
 		global Polarity, Ans2
 		Polarity = 0
-		print("polarity")
 		Ans2 = True
 		self.pro.config(state="normal")
 		self.neutral.config(state=DISABLED)
 		self.anti.config(state="normal")
+
+	def tag(self):
+		global tag, Ans3
+		tag = 1
+		Ans3 = True
+		self.notag.config(state="normal")
+		self.tag.config(state=DISABLED)
+
+	def notag(self):
+		global tag, Ans3
+		tag = 0
+		Ans3 = True
+		self.notag.config(state=DISABLED)
+		self.tag.config(state="normal")
 
 	def count(self):
 
@@ -146,6 +159,8 @@ class API():
 		self.pro.config(state="normal")
 		self.anti.config(state="normal")
 		self.neutral.config(state="normal")
+		self.tag.config(state="normal")
+		self.notag.config(state="normal")
 		# download_blob("record.json","temp2.json")
 		with open("temp2.json",'r') as input:
 			data = json.load(input)
@@ -161,10 +176,11 @@ class API():
 		with open(temp_file,'r+') as json_file:  
 			data = json.load(json_file)
 			
-		if Ans1 and Ans2:
+		if Ans1 and Ans2 and Ans3:
 			data["User"] = User
 			data["Label"] = MisInf
 			data["Polarity"] = Polarity
+			data['Compound'] = tag
 			with open(temp_file,'w+') as write: 
 				json.dump(data,write,indent=4)
 			upload_blob(temp_file,self.blob.name)
@@ -186,6 +202,8 @@ class API():
 			self.pro.config(state="normal")
 			self.anti.config(state="normal")
 			self.neutral.config(state="normal")
+			self.tag.config(state="normal")
+			self.notag.config(state="normal")
 			self.count()
 			upload_blob("temp2.json","record.json","project_vaxx")
 			self.Update()
@@ -196,10 +214,14 @@ class API():
 	  
 
 	def clicked_next(self):
+		global blobs
 		self.true.config(state="normal")
 		self.false.config(state="normal")
 		self.pro.config(state="normal")
 		self.anti.config(state="normal")
+		self.neutral.config(state="normal")
+		self.tag.config(state="normal")
+		self.notag.config(state="normal")
 		self.Update()
 
 	def clicked_skip(self):
@@ -208,6 +230,9 @@ class API():
 		self.false.config(state="normal")
 		self.pro.config(state="normal")
 		self.anti.config(state="normal")
+		self.neutral.config(state="normal")
+		self.tag.config(state="normal")
+		self.notag.config(state="normal")
 
 		file_skip = self.blob.name
 
@@ -220,6 +245,9 @@ class API():
 		self.false.config(state="normal")
 		self.pro.config(state="normal")
 		self.anti.config(state="normal")
+		self.neutral.config(state="normal")
+		self.tag.config(state="normal")
+		self.notag.config(state="normal")
 
 		file_delete = self.blob.name
 
@@ -240,9 +268,10 @@ class API():
 		self.panel.image = photo
 
 	def Update(self):
-		global blobs, Ans1, Ans2,count
+		global blobs, Ans1, Ans2, Ans3, count
 		Ans1 = False
 		Ans2 = False
+		Ans3 = False
 
 		try:
 			self.blob = next(blobs)
@@ -362,23 +391,31 @@ class API():
 
 		self.pro.grid(row=1,column=6, padx=(int(5*new_w),int(30*new_w)), pady=(int(5*new_h),int(5*new_h)),columnspan=1,sticky=S+E+W)
 
-		self.Label1 = Label(self.frame,text= " Misinformation",relief="ridge",borderwidth=2,anchor=W)
-		self.Label1.grid(row=2,column=4, padx=(int(15*new_w),int(0*new_w)), pady=(int(0*new_h),int(0*new_h)))
+		self.tag = Button(self.frame, text="Sarcasm/Irony/Humor", command=self.tag, highlightbackground='#3E4149',anchor=CENTER,highlightcolor='white')
+
+		self.tag.grid(row=2,column=4, padx=(int(20*new_w),int(5*new_w)), pady=(int(5*new_h),int(5*new_h)),columnspan=1,sticky=S+E+W)
+
+		self.notag = Button(self.frame, text="None", command=self.notag, highlightbackground='#3E4149',anchor=CENTER,highlightcolor='white')
+
+		self.notag.grid(row=2,column=6, padx=(int(5*new_w),int(30*new_w)), pady=(int(5*new_h),int(5*new_h)),columnspan=1,sticky=S+E+W)
+
+		self.Label1 = Label(self.frame,text= "Misinformation",relief="ridge",borderwidth=2,anchor=W)
+		self.Label1.grid(row=3,column=4, padx=(int(15*new_w),int(0*new_w)), pady=(int(0*new_h),int(0*new_h)))
 
 
 		self.Label2 = Label(self.frame,text= " Other posts ",relief="ridge",borderwidth=2,anchor=W)
-		self.Label2.grid(row=3,column=4, padx= (int(15*new_w),int(0*new_w)), pady=(int(0*new_h),int(0*new_h)))
+		self.Label2.grid(row=4,column=4, padx= (int(15*new_w),int(0*new_w)), pady=(int(0*new_h),int(0*new_h)))
 
 
 		self.Label3 = Label(self.frame,text= "0",relief="ridge",borderwidth=2,anchor=E)
-		self.Label3.grid(row=2,column=6, padx=(int(15*new_w),int(20*new_w)), pady=(int(0*new_h),int(0*new_h)))
+		self.Label3.grid(row=3,column=6, padx=(int(15*new_w),int(20*new_w)), pady=(int(0*new_h),int(0*new_h)))
 
 
 		self.Label4 = Label(self.frame,text= "0",relief="ridge",borderwidth=2,anchor=E)
-		self.Label4.grid(row=3,column=6, padx=(int(15*new_w),int(20*new_w)), pady=(int(0*new_h),int(0*new_h)))
+		self.Label4.grid(row=4,column=6, padx=(int(15*new_w),int(20*new_w)), pady=(int(0*new_h),int(0*new_h)))
 
 		submit = Button(self.frame, text=" Submit ", command=self.submit, highlightbackground='#3E4149',anchor=CENTER)
-		submit.grid(row=4,column=5, columnspan = 1, padx=(int(20*new_w),int(20*new_w)),pady=(int(20*new_h),int(20*new_h)))
+		submit.grid(row=5,column=5, columnspan = 1, padx=(int(20*new_w),int(20*new_w)),pady=(int(20*new_h),int(20*new_h)))
 
 		forward = Button(self.frame, text=" Next ", command=self.clicked_next, highlightbackground='#3E4149',anchor=CENTER)
 		forward.grid(row=6,column=5, columnspan = 1, padx=(int(20*new_w),int(20*new_w)),pady=(int(20*new_h),int(20*new_h)))
