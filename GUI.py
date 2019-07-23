@@ -7,7 +7,7 @@ import PIL
 from PIL import Image, ImageTk
 from google.cloud import storage
 import certifi
-
+import random
 print("All imports worked")
 count = 0
 
@@ -64,6 +64,8 @@ bucket = storage_client.bucket(bucket_name="project_vaxx",user_project=None)
 
 blobs = bucket.list_blobs(prefix="201", delimiter=None)
 blobs = iter(blobs)
+# blobs = random.sample(iter(blobs),10000)
+
 cwd = os.getcwd()
 
 temp_file = os.path.join(cwd,"temp.json")
@@ -272,16 +274,32 @@ class API():
 		Ans1 = False
 		Ans2 = False
 		Ans3 = False
-
-		try:
+		download_blob('log.json','log.json')
+		active = []
+		with open('log.json','r') as ip:
+			data = json.load(ip)
+		active = [data[key] for key in data]
+		print(active)
+		# try:
+		while(1):
 			self.blob = next(blobs)
-			print(self.blob)
-		except:
-			self.frame.destroy()
+			if self.blob.name not in active:
+				try:
+					download_blob(self.blob.name,temp_file)
+					data[User] = self.blob.name
+					with open('log.json','w') as op:
+						json.dump(data,op, indent=2)
+					upload_blob('log.json','log.json','project_vaxx')
+					break
+				except:
+					pass
+				# print(self.blob)
+		# except:
+		# 	self.frame.destroy()
 
 		# self.count()
 
-		download_blob(self.blob.name,temp_file)
+		
 		with open(temp_file,"r") as input:
 			data = json.load(input)
 		# print(data)
@@ -334,8 +352,7 @@ class API():
 		self.frame = Frame
 		self.frame.title("Data Viewer")
 		self.frame.resizable(width=False, height=False)
-		photo= ImageTk.PhotoImage(file="startup.png")
-		self.panel = Label(self.frame,image=photo, borderwidth=-5,bg = "black",anchor=CENTER)
+		self.panel = Label(self.frame, borderwidth=-5,bg = "black",anchor=CENTER)
 		# # self.panel.pack(side=LEFT, fill="both", expand="True")
 		
 		self.panel.grid(row=0, column = 0,columnspan=4,rowspan=4,sticky=N+S+E+W,padx=(int(35*new_w),int(0*new_w)),pady=(int(20*new_h),int(0*new_h)))
