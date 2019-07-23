@@ -14,7 +14,7 @@ Run the Installer.
 
 ### Usage
 
-Running internet connection required through out.
+Running internet connection required through out. API launch takes some time.
 Annotator launches with initial window to ask user details to keep track of annotators and jobs. Do not leave blank. 
 Dashboard has options to browse (next to browse), delete (irrelevant samples), skip (misrendered image tag/image text, data samples of ambiguous annotation tags), and label polarity and misinformation content of posts.
 Textbox displays caption, image-text rendering and image tags obtained using Google vision API
