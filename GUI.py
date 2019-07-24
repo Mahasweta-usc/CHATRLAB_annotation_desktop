@@ -29,7 +29,7 @@ class shabnam():
 
 	def bsdk(self):
 		global User
-		User = self.e.get()
+		User = self.e.get() # "'{}'".format(self.e.get().replace("'",'"'))
 		if not User:
 			pass
 		else:
@@ -62,9 +62,18 @@ Ans1, Ans2, Ans3 = False, False, False
 storage_client = storage.Client.create_anonymous_client()
 bucket = storage_client.bucket(bucket_name="project_vaxx",user_project=None)
 
-blobs = bucket.list_blobs(prefix="201", delimiter=None)
-blobs = iter(blobs)
-# blobs = random.sample(iter(blobs),10000)
+org = bucket.list_blobs(prefix="201", delimiter=None)
+# blobs = [blobs._get_next_page_response()]
+blobs = []
+for i in org:
+    try:
+        # get the next item
+        blobs.append(i) #org._get_next_page_response()
+        # do something with element
+    except StopIteration:
+        # if StopIteration is raised, break from loop
+        break
+blobs = iter(random.sample(blobs,len(blobs)))
 
 cwd = os.getcwd()
 
@@ -179,10 +188,10 @@ class API():
 			data = json.load(json_file)
 			
 		if Ans1 and Ans2 and Ans3:
-			data["User"] = User
-			data["Label"] = MisInf
-			data["Polarity"] = Polarity
-			data['Compound'] = tag
+			data["Annotations"] = {User:{"Label":...,"Polarity":...,"Compound":...}}
+			data["Annotations"][User]["Label"] = MisInf
+			data["Annotations"][User]["Polarity"] = Polarity
+			data["Annotations"][User]["Compound"] = tag
 			with open(temp_file,'w+') as write: 
 				json.dump(data,write,indent=4)
 			upload_blob(temp_file,self.blob.name)
@@ -282,7 +291,11 @@ class API():
 		print(active)
 		# try:
 		while(1):
-			self.blob = next(blobs)
+			# blobs = iter(random.shuffle(list(blobs),1000))
+			try:
+				self.blob = next(blobs)
+			except:
+				self.frame.destroy()
 			if self.blob.name not in active:
 				try:
 					download_blob(self.blob.name,temp_file)
