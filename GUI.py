@@ -8,6 +8,8 @@ from PIL import Image, ImageTk
 from google.cloud import storage
 import certifi
 import random
+import urllib.request
+from urllib.parse import urljoin
 print("All imports worked")
 count = 0
 
@@ -63,7 +65,7 @@ storage_client = storage.Client.create_anonymous_client()
 bucket = storage_client.bucket(bucket_name="project_vaxx",user_project=None)
 
 org = bucket.list_blobs(prefix="201", delimiter=None)
-# blobs = [blobs._get_next_page_response()]
+# blobs = iter(org)
 blobs = []
 for i in org:
     try:
@@ -291,11 +293,12 @@ class API():
 		print(active)
 		# try:
 		while(1):
-			# blobs = iter(random.shuffle(list(blobs),1000))
 			try:
 				self.blob = next(blobs)
 			except:
+				# pass
 				self.frame.destroy()
+
 			if self.blob.name not in active:
 				try:
 					download_blob(self.blob.name,temp_file)
@@ -329,19 +332,26 @@ class API():
 		except:
 			image_tags = " "
 
-		text = "***Caption***: {} \n\n ***Image Text***: {} \n\n ***Image Tags***: {}".format(caption,image_text,image_tags)
-		url = data["node"]["display_url"]
+		text = ("***Caption***: {} \n\n ***Image Text***: {} \n\n ***Image Tags***: {}".format(caption,image_text,image_tags)).encode("ascii","ignore")
+		# extend = str((self.blob.name).replace(".json",".png"))
+		# print(extend)
+		# url = data["node"]["display_url"]
+		# url = urljoin("https://storage.cloud.google.com","procvaxx/2011-10-29_15-10-37_UTC.png")
+		# print(url)
 		
 
 		try:
-			URL = url
-			# print(URL)
-			try:
-				
-				raw_data = urllib2.urlopen(URL, timeout=60, verify=False).read()
-			except:
-				raw_data = urllib2.urlopen(URL, timeout=60, cafile=certifi.where()).read()
-			im = Image.open(io.BytesIO(raw_data))
+
+			while 1:
+				try:
+					download_blob((self.blob.name).replace(".json",".png"),"image.png","procvaxx")
+					break
+				except Exception as e:
+					print(e)
+					continue
+
+			im = Image.open("image.png") #io.BytesIO(raw_data)
+			print("succeeded")
 			print("tik-tok")
 			width,height=im.size
 			width,height = int(500*new_w),int(500*new_h)
@@ -357,7 +367,8 @@ class API():
 			self.text2.insert(END,text)
 			self.text2.config(state=DISABLED)
 
-		except:
+		except Exception as e:
+			print(e)
 			self.Update()
 
 
