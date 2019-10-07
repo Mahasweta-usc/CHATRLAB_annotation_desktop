@@ -8,10 +8,10 @@ from autolink import linkify
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-vaccine_terms = ["smallpox", "pertussis", "infect", "heart attack", "cancer", "diabetes", "shingles", "paralysis", "cervical cancer", 
-"neurogenesis", "infectious disease", "brain", "asthma", "bowel disease", "kidney",
+vaccine_terms = ["smallpox", "pertussis", "infect", "heart attack", "cancer", "diabetes", "shingles", "paralys", "cervical cancer", 
+"neurogenesis", "infectious disease", "brain", "asthma", "bowel disease", "kidney", "ingredients","safety","symptom",
 "encephalitis", "HOMEOPATHY", "parapertussis", "seizure", "allergies", "SIDS", "placebo", "Fatigue", "shingles", "lizard morphing", "behavior change",
-"strains", "hippocampal neurogenesis", "antibiotics", "uillainBarreSyndrome", "pneumonia", "HPV", "shedding", "vaccin", "pertussis", 
+"strains", "hippocampal neurogenesis", "antibiotic", "Guillain", "syndrome","pneumonia", "HPV", "shedding", "vaccin", "pertussis", 
 "hepatitis", "polio","chickenpox", "measles", "HPV", "rotavirus", "flu", "DPT",
 "MMR", "Tdap", "Hep B", "DTap", "NMDA", "HBV", "Krabbe", "Gardisil", "dog kidney cells", "chicken", "fetal", "babies",
 "cancer", "tumor", "monkey", "rubella", "mumps", "MMR", "measles", "pentavalent", "live virus", "virus","infected", "exposure",
