@@ -46,13 +46,13 @@ class shabnam():
 	def __init__(self,frame):
 		self.frame = frame
 		self.frame.title("User Log")
-		Instr = Label(self.frame,text="User", font=('Helvetica,10'),borderwidth=10,width=40)
+		Instr = Label(self.frame,text="User", font=('Helvetica',15,"bold"),borderwidth=10,width=40)
 		Instr.grid(row=0,column=0, padx=15, pady=10,sticky=E+W)
 		self.e = Entry(self.frame)
-		self.e.grid(row=2,column=0, padx=15, pady=10,sticky=E+W)
+		self.e.grid(row=2,column=0, padx=30, pady=10,sticky=E+W)
 
 		enter = Button(self.frame, text="Enter", command=self.bsdk)
-		enter.grid(row=4,column=0, padx=10, pady=10,sticky=E+W,columnspan=4)
+		enter.grid(row=4,column=0, padx=200, pady=10,sticky=E+W,columnspan=4)
 		
 		# self.frame.destroy()
 
