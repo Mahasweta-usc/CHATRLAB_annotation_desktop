@@ -13,6 +13,7 @@ from urllib.parse import urljoin
 from itertools import cycle
 import unidecode 
 import emoji
+#commit
 
 from process_url import *
 
@@ -570,7 +571,7 @@ class API():
 
 		self.count()
 
-		print(self.completed)
+		# print(self.completed)
 		self.Update()
 
 		print("running")
@@ -590,6 +591,10 @@ def on_closing():
 		json.dump(data,output)
 
 	upload_blob("log.json","log.json","project_vaxx")
+	os.remove("image.png")
+	os.remove("temp.json")
+	os.remove("temp2.json")
+	os.remove("log.json")
 	window.destroy()
 	exit()
 
