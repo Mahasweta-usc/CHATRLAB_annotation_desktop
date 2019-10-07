@@ -160,13 +160,20 @@ class API():
 	
 	def tag(self,val):
 		global tag, Ans3
-		tag.append(val)
-		Ans3 = True
 
-		for key,value in self.category.items():
-			if key in tag:
-				value.config(state=DISABLED)
-			else:
+		if val:
+			tag.append(val)
+			Ans3 = True
+
+			for key,value in self.category.items():
+				if key in tag:
+					value.config(state=DISABLED)
+				else:
+					value.config(state="normal")
+		else:
+			Ans3 = False
+			tag = []
+			for key,value in self.category.items():
 				value.config(state="normal")
 		
 
@@ -503,7 +510,9 @@ class API():
 
 		self.tag9.grid(row=4,column=6, padx=(int(5*new_w),int(30*new_w)), pady=(int(5*new_h),int(5*new_h)),columnspan=1,sticky=E+W)
 
+		self.tag0 = Button(self.frame, text="Reset Category", command=lambda: self.tag(0), highlightbackground='black',anchor=CENTER,highlightcolor='white')
 
+		self.tag0.grid(row=4,column=5, padx=(int(50*new_w),int(50*new_w)), pady=(int(0*new_h),int(50*new_h)),columnspan=1,sticky=S+E+W)
 
 
 
@@ -520,11 +529,12 @@ class API():
 		6:self.tag6,
 		7:self.tag7,
 		8:self.tag8,
-		9:self.tag9
+		9:self.tag9,
+		0:self.tag0
 		}
 
 		self.Label2 = Label(self.frame,text= " Total Posts Labeled by {}:".format(User),relief="ridge",borderwidth=2,anchor=W,font=("Helvetica", 15, "bold"))
-		self.Label2.grid(row=5,column=4, padx= (int(15*new_w),int(0*new_w)), pady=(int(0*new_h),int(0*new_h)))
+		self.Label2.grid(row=5,column=4, padx= (int(15*new_w),int(0*new_w)), pady=(int(0*new_h),int(0*new_h)),sticky=S+E+W)
 
 
 		# self.Label3 = Label(self.frame,text= "0",relief="ridge",borderwidth=2,anchor=E)
@@ -536,18 +546,18 @@ class API():
 
 		submit = Button(self.frame, text=" Submit ", command=self.submit, highlightbackground='#3E4149',anchor=CENTER)
 		# submit.grid(row=5,column=5, columnspan = 1, padx=(int(20*new_w),int(20*new_w)),pady=(int(20*new_h),int(20*new_h)))
-		submit.grid(row=6,column=5, columnspan = 1, padx=(int(20*new_w),int(20*new_w)),pady=(int(20*new_h),int(20*new_h)))
+		submit.grid(row=6,column=5, columnspan = 1, padx=(int(20*new_w),int(20*new_w)),pady=(int(20*new_h),int(50*new_h)),sticky=S+E+W)
 
 		# forward = Button(self.frame, text=" Next ", command=self.clicked_next, highlightbackground='#3E4149',anchor=CENTER)
 		
 		
 
-		skip = Button(self.frame, text=" Next ", command=self.clicked_skip, highlightbackground='#3E4149',anchor=W)
+		skip = Button(self.frame, text=" Next ", command=self.clicked_skip, highlightbackground='#3E4149',anchor=CENTER)
 
-		skip.grid(row=6,column=1, padx=(int(5*new_w),int(5*new_w)), pady=(int(20*new_h),int(20*new_h)))
+		skip.grid(row=6,column=1, padx=(int(5*new_w),int(5*new_w)), pady=(int(20*new_h),int(50*new_h)),sticky=S+E+W)
 
-		delete = Button(self.frame, text="Delete", command=self.clicked_delete, highlightbackground='#3E4149',anchor=E)
-		delete.grid(row=6,column=2, padx=(int(25*new_w),int(0*new_w)),pady=(int(20*new_h),int(20*new_h)))
+		delete = Button(self.frame, text="Delete", command=self.clicked_delete, highlightbackground='#3E4149',anchor=CENTER)
+		delete.grid(row=6,column=2, padx=(int(25*new_w),int(0*new_w)),pady=(int(20*new_h),int(50*new_h)),sticky=S+E+W)
 
 		# self.next = Button(self.frame, text="         >>        ", command=self.next,font=('Helvetica',10))
 
