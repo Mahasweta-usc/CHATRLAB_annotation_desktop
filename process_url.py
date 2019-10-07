@@ -10,12 +10,12 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 vaccine_terms = ["smallpox", "pertussis", "infect", "heart attack", "cancer", "diabetes", "shingles", "paralysis", "cervical cancer", 
 "neurogenesis", "infectious disease", "brain", "asthma", "bowel disease", "kidney",
-"encephalitis", "HOMEOPATHY", "parapertussis", "seizures", "allergies", "SIDS", "placebo", "Fatigue", "shingles", "lizard morphing", "behavior",
-"change", "strains", "hippocampal neurogenesis", "antibiotics", "uillainBarreSyndrome", "pneumonia", "HPV", "shedding", "vaccin", "pertussis", 
+"encephalitis", "HOMEOPATHY", "parapertussis", "seizure", "allergies", "SIDS", "placebo", "Fatigue", "shingles", "lizard morphing", "behavior change",
+"strains", "hippocampal neurogenesis", "antibiotics", "uillainBarreSyndrome", "pneumonia", "HPV", "shedding", "vaccin", "pertussis", 
 "hepatitis", "polio","chickenpox", "measles", "HPV", "rotavirus", "flu", "DPT",
 "MMR", "Tdap", "Hep B", "DTap", "NMDA", "HBV", "Krabbe", "Gardisil", "dog kidney cells", "chicken", "fetal", "babies",
 "cancer", "tumor", "monkey", "rubella", "mumps", "MMR", "measles", "pentavalent", "live virus", "virus","infected", "exposure",
-"aluminum", "mercury", "thimerosal", "fetal", "babies", "Autism", "Infant mortality"]
+"aluminum", "mercury", "thimerosal", "fetal", "babies", "Autism", "Infant mortality", "bacteria"]
 
 vaccine_terms = [item.casefold() for item in vaccine_terms]
 
