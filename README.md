@@ -23,6 +23,6 @@ Counter to track number of posts labeled by every user.
 Delete images irrelevant to content, skip if not confident of appropriate label or content has a mismatch between actual image-text and rendered image-text/image object labels.
 Deleted images are stored separately and can be retrieved as necessary. 
 Choose between several categories of posts as you may deem relevant. Multiple choices if indicated, are recorded.
-Final responses are not recorded until you "submit". Change selections if required before "submitting" final labels. 
+Final responses are not recorded until you "submit". Shift between selections of polarity and content label if required before "submitting" final selections. Or use "reset category" to re-enter category choices before submission. 
 Interface closes when annnotation of all posts is completed by a user or remaining posts are being viewed by other users. Message is displayed in Terminal accordingly. 
 If runtime issues are encountered,open an "issue" thread (GitHub account required) or email repo owner.
