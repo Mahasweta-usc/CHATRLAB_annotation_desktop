@@ -19,7 +19,7 @@ Annotator launches with initial window to ask user details to keep track of anno
 Choose unique username to record responses
 Dashboard has options to browse (next to browse), delete (irrelevant samples), and label polarity, category and misinformation content of posts.
 Textbox displays caption, image-text rendering and information extracted from URLs
-Counter to track number of posts labeled by every user
+Counter to track number of posts labeled by every user.
 Delete images irrelevant to content, skip if not confident of appropriate label or content has a mismatch between actual image-text and rendered image-text/image object labels.
 Deleted images are stored separately and can be retrieved as necessary. 
 Choose between several categories of posts as you may deem relevant. Multiple choices if indicated, are recorded.
