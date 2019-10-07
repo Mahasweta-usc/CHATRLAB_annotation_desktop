@@ -1,11 +1,11 @@
 # Data Viewer
 
-Data visualizer for browsing/annotation for Instagram Vaccination Misinformation project.
+Interactive Data visualizer for browsing/annotation for Instagram Vaccination Misinformation project. Requests information from Google cloud storage, stores updated Annotation responses.
 
 ## Getting Started
 
-Download all the files.Extract the folder. 
-Execute bash script mac-setup.command by clicking icon and chosing to run in Terminal. Alternatively open a Terminal, change to application directory, and type ./mac-setup.command
+Download all the files. Extract the folder. 
+Execute bash script mac-setup.command by clicking icon and chosing to run in Terminal. Alternatively open a Terminal, change to application directory, ex: type cd /home/<User>/Downloads/Data_viewer and type ./mac-setup.command
 
 ### Prerequisites
 
@@ -16,9 +16,13 @@ Run the Installer.
 
 Running internet connection required through out. API launch takes some time.
 Annotator launches with initial window to ask user details to keep track of annotators and jobs. Do not leave blank. 
-Dashboard has options to browse (next to browse), delete (irrelevant samples), skip (misrendered image tag/image text, data samples of ambiguous annotation tags), and label polarity and misinformation content of posts.
-Textbox displays caption, image-text rendering and image tags obtained using Google vision API
-Counter to track number of misinformation posts detected
+Choose unique username to record responses
+Dashboard has options to browse (next to browse), delete (irrelevant samples), and label polarity, category and misinformation content of posts.
+Textbox displays caption, image-text rendering and information extracted from URLs
+Counter to track number of posts labeled by every user
 Delete images irrelevant to content, skip if not confident of appropriate label or content has a mismatch between actual image-text and rendered image-text/image object labels.
-Deleted images are stored in a separete bucket and can be retrieved as necessary. 
-
+Deleted images are stored separately and can be retrieved as necessary. 
+Choose between several categories of posts as you may deem relevant. Multiple choices if indicated, are recorded.
+Final responses are not recorded until you "submit". Change selections if required before "submitting" final labels. 
+Interface closes when annnotation of all posts is completed by a user or remaining posts are being viewed by other users. Message is displayed in Terminal accordingly. 
+If runtime issues are encountered,open an "issue" thread (GitHub account required) or email repo owner.
