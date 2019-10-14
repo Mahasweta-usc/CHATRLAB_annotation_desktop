@@ -14,7 +14,7 @@ from itertools import cycle
 import unidecode 
 import emoji
 #commit
-
+import signal
 from process_url import *
 
 print("All imports worked")
@@ -178,7 +178,7 @@ class API():
 				value.config(state="normal")
 		
 
-	def count(self):
+	def count(self,val):
 
 		for key,value in self.label.items():
 			value.config(state="normal")
@@ -199,9 +199,11 @@ class API():
 		if User not in data.keys():
 			data[User] = 0
 
+		data[User] += val
 		self.completed = data[User]
+
 		self.Label4.configure(text="  " + str(data[User])+ "  " )
-		self.Label4.text=str(data[User])
+		# self.Label4.text=str(data[User])
 
 		with open("temp2.json",'w+') as output: 
 			json.dump(data,output)
@@ -223,23 +225,11 @@ class API():
 				json.dump(data,write,indent=4)
 			upload_blob(temp_file,self.blob.name)
 			
-			download_blob("record.json","temp2.json")
-
-			with open("temp2.json",'r+') as ip:
-				data2 = json.load(ip)
-
-
-			if User not in data2.keys():
-				data2[User] = 0
-				
-			data2[User] += 1
-			with open("temp2.json",'w+') as output: 
-				json.dump(data2,output)
-			upload_blob("temp2.json","record.json","project_vaxx")
+			# download_blob("record.json","temp2.json")
 
 			self.completed = data2[User]
 
-			self.count()
+			self.count(1)
 			self.marked.append(self.blob.name)
 			self.Update()
 
@@ -282,6 +272,7 @@ class API():
 		file_delete = self.blob.name
 
 		delete_blob(file_delete)
+		self.count(1)
 		self.Update()
 
 
@@ -348,7 +339,7 @@ class API():
 				except:
 					continue
 		
-		self.count()
+		self.count(0)
 		with open(temp_file,"r") as ip:
 			data = json.load(ip)
 		try:
@@ -364,19 +355,19 @@ class API():
 		except:
 			image_tags = " "
 
-		text = caption + " " + image_text
+		# text = caption + " " + image_text
 
 
-		url_info = URL_rep(text)
+		# url_info = URL_rep(text)
 
-		# text = text
+		# # text = text
 
-		meta = ""
+		# meta = ""
 
-		for key,value in url_info.items():
-			meta += "{} \n : {} \n".format(key,value)
+		# for key,value in url_info.items():
+		# 	meta += "{} \n : {} \n".format(key,value)
 		
-		meta = meta.encode(encoding='UTF-8',errors='ignore')
+		# meta = meta.encode(encoding='UTF-8',errors='ignore')
 
 		# text += meta 
 
@@ -405,8 +396,8 @@ class API():
 			self.text2.insert(END,"{} \n\n".format(caption).encode(encoding='UTF-8',errors='ignore'))
 			self.text2.insert(END,"***Image text***: ","bold")
 			self.text2.insert(END,"{} \n\n".format(image_text).encode(encoding='UTF-8',errors='ignore'))
-			self.text2.insert(END,"\n\n***URL extracts***:\n","bold")
-			self.text2.insert(END,meta)
+			# self.text2.insert(END,"\n\n***URL extracts***:\n","bold")
+			# self.text2.insert(END,meta)
 			self.text2.config(state=DISABLED)
 
 		except Exception as e:
@@ -537,11 +528,6 @@ class API():
 		self.Label2 = Label(self.frame,text= " Total Posts Labeled by {}:".format(User),relief="ridge",borderwidth=2,anchor=W,font=("Helvetica", 15, "bold"))
 		self.Label2.grid(row=5,column=4, padx= (int(15*new_w),int(0*new_w)), pady=(int(0*new_h),int(0*new_h)),sticky=S+E+W)
 
-
-		# self.Label3 = Label(self.frame,text= "0",relief="ridge",borderwidth=2,anchor=E)
-		# self.Label3.grid(row=3,column=6, padx=(int(15*new_w),int(20*new_w)), pady=(int(0*new_h),int(0*new_h)))
-
-
 		self.Label4 = Label(self.frame,text= "0",relief="ridge",borderwidth=2,anchor=E,font=("Helvetica", 15, "bold"))
 		self.Label4.grid(row=5,column=6, padx=(int(15*new_w),int(20*new_w)), pady=(int(0*new_h),int(0*new_h)))
 
@@ -560,16 +546,11 @@ class API():
 		delete = Button(self.frame, text="Delete", command=self.clicked_delete, highlightbackground='#3E4149',anchor=CENTER)
 		delete.grid(row=6,column=2, padx=(int(25*new_w),int(0*new_w)),pady=(int(20*new_h),int(50*new_h)),sticky=S+E+W)
 
-		# self.next = Button(self.frame, text="         >>        ", command=self.next,font=('Helvetica',10))
-
-		# self.next.grid(row=5,column=1, padx=(int(5*new_w),int(30*new_w)), pady=(int(5*new_h),int(5*new_h)),columnspan=1)
-		# self.next.config(state=DISABLED)
 		global blobs
 
-		# download_blob("record.json","temp2.json")
 		self.completed = 0
 
-		self.count()
+		self.count(0)
 
 		# print(self.completed)
 		self.Update()
@@ -598,15 +579,19 @@ def on_closing():
 	window.destroy()
 	exit()
 
+def signal_handler(signum,frame):
+	on_closing()
 
 screen_width = window.winfo_screenwidth()
 screen_height = window.winfo_screenheight()
-# print(screen_width,screen_height)
 
 new_h = screen_height/1080
 new_w = screen_width/1920
 
-# print([new_h,new_w])
+
+signal.signal(signal.SIGINT, signal_handler)
+signal.signal(signal.SIGTERM, signal_handler)
+signal.signal(signal.SIGHUP, signal_handler)
 
 obj = API(window)
 window.protocol("WM_DELETE_WINDOW", on_closing)
