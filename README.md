@@ -5,7 +5,7 @@ Interactive Data visualizer for browsing/annotation for Instagram Vaccination Mi
 ## Getting Started
 
 Download all the files. Extract the folder. 
-Execute bash script mac-setup.command by clicking icon and chosing to run in Terminal. Alternatively open a Terminal, change to application directory, ex: type cd /home/<User>/Downloads/Data_viewer <or your folder path> && ./mac-setup.command
+Execute bash script mac-setup.command by clicking icon and chosing to run in Terminal. Alternatively open a Terminal, change to application directory, ex: type cd /home/<<user>>/Downloads/Data_viewer (or your folder path) && ./mac-setup.command
 
 ### Prerequisites
 
