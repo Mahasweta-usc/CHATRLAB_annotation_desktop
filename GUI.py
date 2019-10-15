@@ -14,7 +14,7 @@ from itertools import cycle
 import unidecode 
 import emoji
 #commit
-import signal
+
 from process_url import *
 
 print("All imports worked")
@@ -588,10 +588,13 @@ screen_height = window.winfo_screenheight()
 new_h = screen_height/1080
 new_w = screen_width/1920
 
-
-signal.signal(signal.SIGINT, signal_handler)
-signal.signal(signal.SIGTERM, signal_handler)
-signal.signal(signal.SIGHUP, signal_handler)
+try:
+	import signal
+	signal.signal(signal.SIGINT, signal_handler)
+	signal.signal(signal.SIGTERM, signal_handler)
+	signal.signal(signal.SIGHUP, signal_handler)
+except:
+	pass
 
 obj = API(window)
 window.protocol("WM_DELETE_WINDOW", on_closing)
