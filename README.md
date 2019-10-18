@@ -26,3 +26,6 @@ Choose between several categories of posts as you may deem relevant. Multiple ch
 Final responses are not recorded until you "submit". Shift between selections of polarity and content label if required before "submitting" final selections. Or use "reset category" to re-enter category choices before submission. 
 Interface closes when annnotation of all posts is completed by a user or remaining posts are being viewed by other users. Message is displayed in Terminal accordingly. 
 If runtime issues are encountered,open an "issue" thread (GitHub account required) or email repo owner.
+
+### Update
+10/18/2019 1.Tracking deletion of posts irrelevant to the scope of study (for example room cleaners from brand "Vax" or the band The Vaccines) 2. Updating log files upon termination. I added some signal handlers which should work for Linux and Mac OS. but it is recommended that users close the API interface before closing the terminal so that their activity gets refreshed for the next session. 3. Removing inclusion of URL data, something I discussed with Dr. Zhang, so that users can navigate between samples faster without having to download HTML contents. 
