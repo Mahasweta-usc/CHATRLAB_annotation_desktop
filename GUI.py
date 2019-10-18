@@ -227,7 +227,7 @@ class API():
 			
 			# download_blob("record.json","temp2.json")
 
-			self.completed = data2[User]
+			# self.completed = data2[User]
 
 			self.count(1)
 			self.marked.append(self.blob.name)
@@ -254,6 +254,7 @@ class API():
 		skipped = blobs.pop(blobs.index(self.blob))
 		blobs.append(skipped)
 		# self.marked.append(self.blob.name)
+		self.count(0)
 		self.Update()
 
 	def clicked_delete(self):
@@ -273,6 +274,7 @@ class API():
 
 		delete_blob(file_delete)
 		self.count(1)
+		self.marked.append(self.blob.name)
 		self.Update()
 
 
@@ -301,7 +303,7 @@ class API():
 			try:
 				self.blob = next(self.blobs)
 			except:
-				if self.completed == len(blobs):
+				if self.completed >= len(list(self.blobs)):
 					sys.stdout.write("All Annotations complete")
 				else:
 					sys.stdout.write("Files busy. Try Again Later")
@@ -572,10 +574,14 @@ def on_closing():
 		json.dump(data,output)
 
 	upload_blob("log.json","log.json","project_vaxx")
-	os.remove("image.png")
-	os.remove("temp.json")
-	os.remove("temp2.json")
-	os.remove("log.json")
+	try:
+		os.remove("image.png")
+		os.remove("temp.json")
+		os.remove("temp2.json")
+		os.remove("log.json")
+	except:
+		pass
+		
 	window.destroy()
 	exit()
 
