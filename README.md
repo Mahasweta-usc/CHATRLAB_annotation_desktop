@@ -29,3 +29,5 @@ If runtime issues are encountered,open an "issue" thread (GitHub account require
 
 ### Update
 10/18/2019 1.Tracking deletion of posts irrelevant to the scope of study (for example room cleaners from brand "Vax" or the band The Vaccines) 2. Updating log files upon termination. I added some signal handlers which should work for Linux and Mac OS. but it is recommended that users close the API interface before closing the terminal so that their activity gets refreshed for the next session. 3. Removing inclusion of URL data, something I discussed with Dr. Zhang, so that users can navigate between samples faster without having to download HTML contents. 
+
+11/25/2019: Style/Content/Topic options. Faster navigation. Completed posts count displayed is an estimate and may not increment evenly
