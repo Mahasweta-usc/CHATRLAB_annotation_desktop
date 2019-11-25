@@ -1,4 +1,9 @@
 import os, sys
+
+def DevNull():
+	pass
+
+sys.stderr = DevNull()
 import io
 from tkinter import *
 import json
@@ -15,15 +20,13 @@ import unidecode
 import emoji
 #commit
 
-from process_url import *
+# from process_url import *
 
 print("All imports worked")
 count = 0
 
 User=""
 
-# screen = os.popen("xrandr -q -d :0").readlines()[0]
-# print(screen)
 
 
 
@@ -63,10 +66,10 @@ Query.protocol("WM_DELETE_WINDOW", on_closing_entry)
 Query.mainloop()
 
 MisInf, Polarity, tag =  1,1,[]
-Ans1, Ans2, Ans3 = False, False, False
+Ans1, Ans2, Ans3 = False, False, True
 
 storage_client = storage.Client.create_anonymous_client()
-bucket = storage_client.bucket(bucket_name="project_vaxx",user_project=None)
+bucket = storage_client.bucket(bucket_name="labeled_vaxx",user_project=None)
 
 org = bucket.list_blobs(prefix="201", delimiter=None)
 # blobs = iter(org)
@@ -80,26 +83,26 @@ for i in org:
         # if StopIteration is raised, break from loop
         break
 
-
+org_len = len(blobs)
 cwd = os.getcwd()
 
 temp_file = os.path.join(cwd,"temp.json")
 
 
 
-def upload_blob(source, destination_blob_name, bucket_name = "project_vaxx"):
+def upload_blob(source, destination_blob_name, bucket_name = "labeled_vaxx"):
 	bucket_t = storage_client.bucket(bucket_name, user_project=None)
 	temp = storage.Blob(destination_blob_name, bucket_t)
 
 	temp.upload_from_filename(source)
 
-def download_blob(source_blob_name, destination_file_name, bucket_name = "project_vaxx"):
+def download_blob(source_blob_name, destination_file_name, bucket_name = "labeled_vaxx"):
 	bucket_t = storage_client.bucket(bucket_name, user_project=None)
 	temp = storage.Blob(source_blob_name, bucket_t)
 
 	temp.download_to_filename(destination_file_name)
 
-def delete_blob(blob_name, bucket_name = "project_vaxx"):
+def delete_blob(blob_name, bucket_name = "labeled_vaxx"):
 	bucket_t = storage_client.bucket(bucket_name, user_project=None)
 	temp = storage.Blob(blob_name, bucket_t)
 	# # print('Blob {} deleted.'.format(temp))
@@ -107,7 +110,7 @@ def delete_blob(blob_name, bucket_name = "project_vaxx"):
 	name = "xxx-" + blob_name
 	blob = bucket_t.rename_blob(blob, name)
 
-def skip_blob(blob_name, bucket_name = "project_vaxx"):
+def skip_blob(blob_name, bucket_name = "labeled_vaxx"):
 	bucket_t = storage_client.bucket(bucket_name, user_project=None)
 	temp = storage.Blob(blob_name, bucket_t)
 	# # print('Blob {} deleted.'.format(temp))
@@ -160,11 +163,10 @@ class API():
 
 	
 	def tag(self,val):
-		global tag, Ans3
+		global tag
 
 		if val:
 			tag.append(val)
-			Ans3 = True
 
 			for key,value in self.category.items():
 				if key in tag:
@@ -172,7 +174,6 @@ class API():
 				else:
 					value.config(state="normal")
 		else:
-			Ans3 = False
 			tag = []
 			for key,value in self.category.items():
 				value.config(state="normal")
@@ -180,6 +181,7 @@ class API():
 
 	def count(self,val):
 
+		# pass
 		for key,value in self.label.items():
 			value.config(state="normal")
 
@@ -190,47 +192,34 @@ class API():
 		for key,value in self.category.items():
 			value.config(state="normal")
 
-		download_blob("record.json","temp2.json")
-
-		with open("temp2.json",'r') as ip:
-			data = json.load(ip)
-
-
-		if User not in data.keys():
-			data[User] = 0
-
-		data[User] += val
-		self.completed = data[User]
-
-		self.Label4.configure(text="  " + str(data[User])+ "  " )
-		# self.Label4.text=str(data[User])
-
-		with open("temp2.json",'w+') as output: 
-			json.dump(data,output)
-
-		upload_blob("temp2.json","record.json","project_vaxx")
-
+		self.Label4.configure(text="  Total Posts annotated by {}: {}  ".format(User,self.completed) )
 
 
 	def submit(self):
-		global blobs, MisInf, tag, Polarity, Ans1, Ans2, Ans3, marked
+		global blobs, MisInf, tag, Polarity, Ans1, Ans2, Ans3
 		
 			
 		if Ans1 and Ans2 and Ans3:
 			with open(temp_file,'r+') as json_file:  
 				data = json.load(json_file)
+
+			try:
+				print(data["Annotations"])
+			except:
+				data["Annotations"] = {}
+
 			data["Annotations"][User] = {"Label":MisInf,"Polarity":Polarity,"Category":tag}
 
 			with open(temp_file,'w+') as write: 
 				json.dump(data,write,indent=4)
+
 			upload_blob(temp_file,self.blob.name)
-			
-			# download_blob("record.json","temp2.json")
+			print(data["Annotations"][User])
 
-			# self.completed = data2[User]
-
+			self.completed += 1
+			# self.marked.append(self.blob.name)
+			blobs.pop(blobs.index(self.blob))
 			self.count(1)
-			self.marked.append(self.blob.name)
 			self.Update()
 
 
@@ -250,10 +239,8 @@ class API():
 		for key,value in self.category.items():
 			value.config(state="normal")
 
-		# print(blobs)
 		skipped = blobs.pop(blobs.index(self.blob))
 		blobs.append(skipped)
-		# self.marked.append(self.blob.name)
 		self.count(0)
 		self.Update()
 
@@ -273,8 +260,10 @@ class API():
 		file_delete = self.blob.name
 
 		delete_blob(file_delete)
+		# self.completed += 1
+		# self.marked.append(self.blob.name)
+		blobs.pop(blobs.index(self.blob))
 		self.count(1)
-		self.marked.append(self.blob.name)
 		self.Update()
 
 
@@ -288,60 +277,38 @@ class API():
 		global blobs, Ans1, Ans2, Ans3, count,tag
 		Ans1 = False
 		Ans2 = False
-		Ans3 = False
+		Ans3 = True
 		tag = []
-		download_blob('log.json','log.json')
-		with open('log.json','r') as ip:
-			data = json.load(ip)
-		active = [data[key] for key in data.keys()]
 
-		# print(blobs)
-		# print(len(self.marked))
-		self.blobs = self.skip_matching(blobs, self.marked)
+		self.blobs = iter(blobs)
 
-		while(1):
-			try:
-				self.blob = next(self.blobs)
-			except:
-				if self.completed >= len(list(self.blobs)):
-					sys.stdout.write("All Annotations complete")
-				else:
-					sys.stdout.write("Files busy. Try Again Later")
-				on_closing()
+		if blobs:
+			self.blob = next(self.blobs)
 
-			try:
-				download_blob(self.blob.name,temp_file)
-			except:
-				continue
-			
-			with open(temp_file,'r') as ip:
-				data2 = json.load(ip)
-
-			#If already annotated
-
-			if "Annotations" in data2:
-				if User in data2["Annotations"].keys():
-					continue
+		else:
+			if self.completed >= org_len:
+				sys.stdout.write("All Annotations complete\n")
 			else:
-				data2["Annotations"] = {}
+				sys.stdout.write("Files busy. Try Again Later")
+			on_closing()
 
-			with open(temp_file,'w+') as write: 
-				json.dump(data2,write,indent=4)
-			upload_blob(temp_file,self.blob.name)
+		try:
+			download_blob(self.blob.name,temp_file)
+		except:
+			self.Update()
+	
+		with open(temp_file,'r') as ip:
+			data2 = json.load(ip)
 
-			#File not open with another user
-
-			if self.blob.name not in active:
-				try:
-					data[User] = self.blob.name
-					with open('log.json','w') as op:
-						json.dump(data,op, indent=2)
-					upload_blob('log.json','log.json','project_vaxx')
-					break
-				except:
-					continue
+		try:
+			self.completed += 1
+			blobs.pop(blobs.index(self.blob))
+			self.Update()
+		except:
+			pass
+				
 		
-		self.count(0)
+		# self.count(0)
 		with open(temp_file,"r") as ip:
 			data = json.load(ip)
 		try:
@@ -356,22 +323,6 @@ class API():
 			image_tags = ", ".join(data['tags'])
 		except:
 			image_tags = " "
-
-		# text = caption + " " + image_text
-
-
-		# url_info = URL_rep(text)
-
-		# # text = text
-
-		# meta = ""
-
-		# for key,value in url_info.items():
-		# 	meta += "{} \n : {} \n".format(key,value)
-		
-		# meta = meta.encode(encoding='UTF-8',errors='ignore')
-
-		# text += meta 
 
 		try:
 
@@ -401,112 +352,166 @@ class API():
 			# self.text2.insert(END,"\n\n***URL extracts***:\n","bold")
 			# self.text2.insert(END,meta)
 			self.text2.config(state=DISABLED)
+			# print(data)
 
 		except Exception as e:
 			# print(e)
 			self.Update()
 
 
-	def __init__(self, Frame):
-		self.frame = Frame
-		self.frame.title("Data Viewer")
-		self.frame.resizable(width=False, height=False)
+	def __init__(self, item):
+		self.frame = Frame(item,bd=20)
+		self.frame.grid(row=0,column=0,sticky=N+S+E+W)
 		self.panel = Label(self.frame, borderwidth=-5,bg = "black",anchor=CENTER)
-		self.marked = []
+		# self.marked = []
 
-		self.panel.grid(row=0, column = 0,columnspan=4,rowspan=4,sticky=N+S+E+W,padx=(int(35*new_w),int(0*new_w)),pady=(int(20*new_h),int(0*new_h)))
+		self.panel.grid(row=0, column = 0,columnspan=4,rowspan=2,sticky=N+S+E+W,padx=(int(35*new_w),int(0*new_w)),pady=(int(20*new_h),int(0*new_h)))
 
-		self.text2 = Text(self.frame, borderwidth= 5,font=("Helvetica", 12), wrap=WORD ,height=15,highlightbackground='white')
+		self.text2 = Text(self.frame, borderwidth= 5,font=("Helvetica", 15), wrap=WORD ,height=15,highlightbackground='white')
 		self.text2.tag_configure("bold", font="Helvetica 15 bold")
 		scroll = Scrollbar(self.frame, orient='vertical',command=self.text2.yview)
 		self.text2.configure(yscrollcommand=scroll.set)
 		self.text2.config(state=DISABLED)
-		self.text2.grid(row=4, column = 0,rowspan=1,columnspan = 4, sticky=E+W, padx=(int(30*new_w),int(0*new_w)))
+		self.text2.grid(row=2, column = 0,rowspan=12,columnspan = 4, sticky=N+S+E+W, padx=(int(30*new_w),int(0*new_w)))
 		self.text2.grid_propagate(True)
 		self.panel.grid_propagate(True)
-		scroll.grid(row=4, column = 3, sticky='nse')
+		scroll.grid(row=2, column = 3, rowspan=12,columnspan=1,sticky='nse')
 		self.frame.grid_columnconfigure(4, weight=1,uniform="tukai")
 
 		self.frame.grid_columnconfigure(5, weight=1,uniform="tukai")
 		self.frame.grid_columnconfigure(6, weight=1,uniform="tukai")
 		heading1 = Label(self.frame,text="Content Label",anchor=CENTER,font=("Helvetica", 15, "bold"))
-		heading1.grid(row=0, column = 5,columnspan=1,sticky=E+W)
+		heading1.grid(row=0, column = 5,columnspan=1,pady=(int(35*new_h),int(5*new_h)),sticky=N+E+W)
 		heading2 = Label(self.frame,text="Vaccination Bias",anchor=CENTER,font=("Helvetica",15, "bold"))
-		heading2.grid(row=1, column = 5,columnspan=1,sticky=E+W)
-		heading3 = Label(self.frame,text="Post Category",anchor=CENTER,font=("Helvetica",15, "bold"))
-		heading3.grid(row=2, column = 5,columnspan=1,sticky=E+W)
+		heading2.grid(row=0, column = 5,columnspan=1,sticky=S+E+W)
+
+		heading4 = Label(self.frame,text="   Content Type   ",anchor=CENTER,fg="#000066",font=("Helvetica",13, "bold"))
+		heading4.grid(row=1, column = 4,columnspan=1, sticky=S+E+W,padx=(int(20*new_w),int(5*new_w)), pady=(int(5*new_h),int(5*new_h)))
+		heading5 = Label(self.frame,text="   Content Style   ",anchor=CENTER,fg="#660066",font=("Helvetica",13, "bold"))
+		heading5.grid(row=1, column = 6,columnspan=1,sticky=S+E+W,padx=(int(5*new_w),int(30*new_w)), pady=(int(5*new_h),int(5*new_h))) #,padx=(int(5*new_w),int(20*new_w))
+		heading3 = Label(self.frame,text="Discussion Topic",anchor=CENTER,font=("Helvetica",13, "bold"),fg="#993333")
+		heading3.grid(row=1, column = 5,columnspan=1,sticky=S+E+W, padx=(int(5*new_w),int(5*new_w)), pady=(int(5*new_h),int(5*new_h)))
 
 		self.cat1 = Button(self.frame, text="Misinformation", command=lambda: self.clicked_true(1), highlightbackground='red',highlightcolor='white',anchor=CENTER)
 
-		self.cat1.grid(row=0,column=4, padx=(int(20*new_w),int(5*new_w)), pady=(int(5*new_h),int(5*new_h)),columnspan=1,sticky=S+E+W)
+		self.cat1.grid(row=0,column=4, padx=(int(20*new_w),int(5*new_w)), pady=(int(5*new_h),int(5*new_h)),columnspan=1,sticky=E+W)
 
 		self.cat2 = Button(self.frame, text="Controversial", command=lambda: self.clicked_true(2), highlightbackground='blue',anchor=CENTER,highlightcolor='white')
 
-		self.cat2.grid(row=0,column=5, padx=(int(5*new_w),int(5*new_w)), pady=(int(5*new_h),int(5*new_h)),columnspan=1,sticky=S+E+W)
+		self.cat2.grid(row=0,column=5, padx=(int(5*new_w),int(5*new_w)), pady=(int(5*new_h),int(5*new_h)),columnspan=1,sticky=E+W)
 
 		self.cat3 = Button(self.frame, text="Clean", command=lambda: self.clicked_true(3), highlightbackground='green',highlightcolor='white',anchor=CENTER)
 
-		self.cat3.grid(row=0,column=6, padx=(int(5*new_w),int(30*new_w)), pady=(int(5*new_h),int(5*new_h)),columnspan=1,sticky=S+E+W)
+		self.cat3.grid(row=0,column=6, padx=(int(5*new_w),int(30*new_w)), pady=(int(5*new_h),int(5*new_h)),columnspan=1,sticky=E+W)
+
+		self.tag0 = Button(self.frame, text="Reset Category", command=lambda: self.tag(0), highlightbackground='black',anchor=CENTER,highlightcolor='white')
+
+		self.tag0.grid(row=9,column=5, columnspan=2, padx= (int(60*new_w),int(70*new_w)), pady=(int(5*new_h),int(5*new_h)),sticky=E+W)
 
 
 
 		self.anti = Button(self.frame, text="Anti", command=self.antivaxx, highlightbackground='red',anchor=CENTER,highlightcolor='white')
 
-		self.anti.grid(row=1,column=4, padx=(int(20*new_w),int(5*new_w)), pady=(int(5*new_h),int(5*new_h)),columnspan=1,sticky=S+E+W)
+		self.anti.grid(row=1,column=4, padx=(int(20*new_w),int(5*new_w)), pady=(int(60*new_h),int(5*new_h)),columnspan=1,sticky=N+E+W)
 
 		self.neutral = Button(self.frame, text="Neutral", command=self.neutral, highlightbackground='blue',anchor=CENTER,highlightcolor='white')
 
-		self.neutral.grid(row=1,column=5, padx=(int(5*new_w),int(5*new_w)), pady=(int(5*new_h),int(5*new_h)),columnspan=1,sticky=S+E+W)
+		self.neutral.grid(row=1,column=5, padx=(int(5*new_w),int(5*new_w)), pady=(int(60*new_h),int(5*new_h)),columnspan=1,sticky=N+E+W)
 
 		self.pro = Button(self.frame, text="Pro", command=self.provaxx, highlightbackground='green',anchor=CENTER,highlightcolor='white')
 
-		self.pro.grid(row=1,column=6, padx=(int(5*new_w),int(30*new_w)), pady=(int(5*new_h),int(5*new_h)),columnspan=1,sticky=S+E+W)
+		self.pro.grid(row=1,column=6, padx=(int(5*new_w),int(30*new_w)), pady=(int(60*new_h),int(5*new_h)),columnspan=1,sticky=N+E+W)
 
+		#Types
 
+		
 
-		self.tag1 = Button(self.frame, text="Sarcasm/Irony/Humor", command=lambda: self.tag(1), highlightbackground='#3E4149',anchor=CENTER,highlightcolor='white')
+		self.tag1 = Button(self.frame, text="Ingredients", command=lambda: self.tag(1), highlightbackground='#3E4149',anchor=CENTER,highlightcolor='white')
 
 		self.tag1.grid(row=2,column=4, padx=(int(20*new_w),int(5*new_w)), pady=(int(5*new_h),int(5*new_h)),columnspan=1,sticky=S+E+W)
 
-		self.tag2 = Button(self.frame, text="Opinion:Argumentative/Advocacy", command=lambda: self.tag(2), highlightbackground='#3E4149',anchor=CENTER,highlightcolor='white')
+		self.tag2 = Button(self.frame, text="Efficacy", command=lambda: self.tag(2), highlightbackground='#3E4149',anchor=CENTER,highlightcolor='white')
 
-		self.tag2.grid(row=2,column=5, padx=(int(5*new_w),int(5*new_w)), pady=(int(5*new_h),int(5*new_h)),columnspan=1,sticky=S+E+W)
+		self.tag2.grid(row=3,column=4, padx=(int(20*new_w),int(5*new_w)), pady=(int(5*new_h),int(5*new_h)),columnspan=1,sticky=S+E+W)
 
+		self.tag3 = Button(self.frame, text="Autism", command=lambda: self.tag(3), highlightbackground='#3E4149',anchor=CENTER,highlightcolor='white')
 
-		self.tag3 = Button(self.frame, text="Opinion:Personal Experience/Inference", command=lambda: self.tag(3), highlightbackground='#3E4149',anchor=CENTER,highlightcolor='white')
+		self.tag3.grid(row=4,column=4, padx=(int(20*new_w),int(5*new_w)), pady=(int(5*new_h),int(5*new_h)),columnspan=1,sticky=S+E+W)
 
-		self.tag3.grid(row=2,column=6, padx=(int(5*new_w),int(30*new_w)), pady=(int(5*new_h),int(5*new_h)),columnspan=1,sticky=S+E+W)
+		self.tag4 = Button(self.frame, text="SBS/Infant Death", command=lambda: self.tag(4), highlightbackground='#3E4149',anchor=CENTER,highlightcolor='white')
 
-		# self.Label1 = Label(self.frame,text= "Misinformation",relief="ridge",borderwidth=2,anchor=W)
-		# self.Label1.grid(row=3,column=4, padx=(int(15*new_w),int(0*new_w)), pady=(int(0*new_h),int(0*new_h)))
-		self.tag4 = Button(self.frame, text="Informative/Reporting", command=lambda: self.tag(4), highlightbackground='#3E4149',anchor=CENTER,highlightcolor='white')
+		self.tag4.grid(row=5,column=4, padx=(int(20*new_w),int(5*new_w)), pady=(int(5*new_h),int(5*new_h)),columnspan=1,sticky=S+E+W)
 
-		self.tag4.grid(row=3,column=4, padx=(int(20*new_w),int(5*new_w)), pady=(int(5*new_h),int(5*new_h)),columnspan=1,sticky=S+E+W)
+		self.tag5 = Button(self.frame, text="Conspiracy", command=lambda: self.tag(5), highlightbackground='#3E4149',anchor=CENTER,highlightcolor='white')
 
-		self.tag5 = Button(self.frame, text="Promotional/Commercial", command=lambda: self.tag(5), highlightbackground='#3E4149',anchor=CENTER,highlightcolor='white')
+		self.tag5.grid(row=6,column=4, padx=(int(20*new_w),int(5*new_w)), pady=(int(5*new_h),int(5*new_h)),columnspan=1,sticky=S+E+W)
 
-		self.tag5.grid(row=3,column=5, padx=(int(5*new_w),int(5*new_w)), pady=(int(5*new_h),int(5*new_h)),columnspan=1,sticky=S+E+W)
+		self.tag6 = Button(self.frame, text="Vaccination Schedule", command=lambda: self.tag(6), highlightbackground='#3E4149',anchor=CENTER,highlightcolor='white')
 
+		self.tag6.grid(row=7,column=4, padx=(int(20*new_w),int(5*new_w)), pady=(int(5*new_h),int(5*new_h)),columnspan=1,sticky=S+E+W)
 
-		self.tag6 = Button(self.frame, text="Campaign(Apolitical)", command=lambda: self.tag(6), highlightbackground='#3E4149',anchor=CENTER,highlightcolor='white')
+		self.tag7 = Button(self.frame, text="Vaccination Rate", command=lambda: self.tag(7), highlightbackground='#3E4149',anchor=CENTER,highlightcolor='white')
 
-		self.tag6.grid(row=3,column=6, padx=(int(5*new_w),int(30*new_w)), pady=(int(5*new_h),int(5*new_h)),columnspan=1,sticky=S+E+W)
+		self.tag7.grid(row=8,column=4, padx=(int(20*new_w),int(5*new_w)), pady=(int(5*new_h),int(5*new_h)),columnspan=1,sticky=N+E+W)
 
-		self.tag8 = Button(self.frame, text="Political/Legal/Social", command=lambda: self.tag(8), highlightbackground='#3E4149',anchor=CENTER,highlightcolor='white')
+		self.tag8 = Button(self.frame, text="Research/Evidence", command=lambda: self.tag(8), highlightbackground='#3E4149',anchor=CENTER,highlightcolor='white')
 
-		self.tag8.grid(row=4,column=5, padx=(int(5*new_w),int(5*new_w)), pady=(int(5*new_h),int(5*new_h)),columnspan=1,sticky=E+W)
+		self.tag8.grid(row=9,column=4, padx=(int(20*new_w),int(5*new_w)), pady=(int(5*new_h),int(5*new_h)),columnspan=1,sticky=N+E+W)
 
-		self.tag7 = Button(self.frame, text="Conspiracy", command=lambda: self.tag(7), highlightbackground='#3E4149',anchor=CENTER,highlightcolor='white')
+		self.tag9 = Button(self.frame, text="Herd Immunity", command=lambda: self.tag(9), highlightbackground='#3E4149',anchor=CENTER,highlightcolor='white')
 
-		self.tag7.grid(row=4,column=4, padx=(int(20*new_w),int(5*new_w)), pady=(int(5*new_h),int(5*new_h)),columnspan=1,sticky=E+W)
+		self.tag9.grid(row=10,column=4, padx=(int(20*new_w),int(5*new_w)), pady=(int(5*new_h),int(5*new_h)),columnspan=1,sticky=N+E+W)
 
-		self.tag9 = Button(self.frame, text="Others", command=lambda: self.tag(9), highlightbackground='#3E4149',anchor=CENTER,highlightcolor='white')
+		self.tag10 = Button(self.frame, text="Vaccine Necessity", command=lambda: self.tag(10), highlightbackground='#3E4149',anchor=CENTER,highlightcolor='white')
 
-		self.tag9.grid(row=4,column=6, padx=(int(5*new_w),int(30*new_w)), pady=(int(5*new_h),int(5*new_h)),columnspan=1,sticky=E+W)
+		self.tag10.grid(row=11,column=4, padx=(int(20*new_w),int(5*new_w)), pady=(int(5*new_h),int(5*new_h)),columnspan=1,sticky=N+E+W)
 
-		self.tag0 = Button(self.frame, text="Reset Category", command=lambda: self.tag(0), highlightbackground='black',anchor=CENTER,highlightcolor='white')
+		self.tag11 = Button(self.frame, text="Vaccine Safety", command=lambda: self.tag(11), highlightbackground='#3E4149',anchor=CENTER,highlightcolor='white')
 
-		self.tag0.grid(row=4,column=5, padx=(int(50*new_w),int(50*new_w)), pady=(int(0*new_h),int(50*new_h)),columnspan=1,sticky=S+E+W)
+		self.tag11.grid(row=12,column=4, padx=(int(20*new_w),int(5*new_w)), pady=(int(5*new_h),int(5*new_h)),columnspan=1,sticky=N+E+W)
+
+		
+
+		self.tag12 = Button(self.frame, text="Campaign", command=lambda: self.tag(21), highlightbackground='#3E4149',anchor=CENTER,highlightcolor='white')
+
+		self.tag12.grid(row=2,column=5, padx=(int(5*new_w),int(5*new_w)), pady=(int(5*new_h),int(5*new_h)),columnspan=1,sticky=S+E+W)
+
+		self.tag13 = Button(self.frame, text="Political/Legal", command=lambda: self.tag(22), highlightbackground='#3E4149',anchor=CENTER,highlightcolor='white')
+
+		self.tag13.grid(row=3,column=5, padx=(int(5*new_w),int(5*new_w)), pady=(int(5*new_h),int(5*new_h)),columnspan=1,sticky=S+E+W)
+
+		self.tag14 = Button(self.frame, text="Promotional/Commercial", command=lambda: self.tag(23), highlightbackground='#3E4149',anchor=CENTER,highlightcolor='white')
+
+		self.tag14.grid(row=4,column=5, padx=(int(5*new_w),int(5*new_w)), pady=(int(5*new_h),int(5*new_h)),columnspan=1,sticky=S+E+W)
+
+		self.tag15 = Button(self.frame, text="Faith", command=lambda: self.tag(24), highlightbackground='#3E4149',anchor=CENTER,highlightcolor='white')
+
+		self.tag15.grid(row=5,column=5, padx=(int(5*new_w),int(5*new_w)), pady=(int(5*new_h),int(5*new_h)),columnspan=1,sticky=S+E+W)
+
+		self.tag16 = Button(self.frame, text="Lawsuits", command=lambda: self.tag(25), highlightbackground='#3E4149',anchor=CENTER,highlightcolor='white')
+
+		self.tag16.grid(row=6,column=5, padx=(int(5*new_w),int(5*new_w)), pady=(int(5*new_h),int(5*new_h)),columnspan=1,sticky=S+E+W)
+
+		#Style
+
+		
+
+		self.tag17 = Button(self.frame, text="Claim", command=lambda: self.tag(31), highlightbackground='#3E4149',anchor=CENTER,highlightcolor='white')
+
+		self.tag17.grid(row=2,column=6, padx=(int(5*new_w),int(30*new_w)), pady=(int(5*new_h),int(5*new_h)),columnspan=1,sticky=S+E+W)
+
+		self.tag18 = Button(self.frame, text="Sarcasm/Irony/Humour", command=lambda: self.tag(32), highlightbackground='#3E4149',anchor=CENTER,highlightcolor='white')
+
+		self.tag18.grid(row=3,column=6, padx=(int(5*new_w),int(30*new_w)), pady=(int(5*new_h),int(5*new_h)),columnspan=1,sticky=S+E+W)
+
+		self.tag19 = Button(self.frame, text="Informative/Reporting", command=lambda: self.tag(33), highlightbackground='#3E4149',anchor=CENTER,highlightcolor='white')
+
+		self.tag19.grid(row=4,column=6, padx=(int(5*new_w),int(30*new_w)), pady=(int(5*new_h),int(5*new_h)),columnspan=1,sticky=S+E+W)
+
+		self.tag20 = Button(self.frame, text="Personal Experience", command=lambda: self.tag(34), highlightbackground='#3E4149',anchor=CENTER,highlightcolor='white')
+
+		self.tag20.grid(row=5,column=6, padx=(int(5*new_w),int(30*new_w)), pady=(int(5*new_h),int(5*new_h)),columnspan=1,sticky=S+E+W)
+
 
 
 
@@ -524,33 +529,43 @@ class API():
 		7:self.tag7,
 		8:self.tag8,
 		9:self.tag9,
+		10:self.tag10,
+		11:self.tag11,
+		21:self.tag12,
+		22:self.tag13,
+		23:self.tag14,
+		24:self.tag15,
+		25:self.tag16,
+		31:self.tag17,
+		32:self.tag18,
+		33:self.tag19,
+		34:self.tag20,
 		0:self.tag0
 		}
 
-		self.Label2 = Label(self.frame,text= " Total Posts Labeled by {}:".format(User),relief="ridge",borderwidth=2,anchor=W,font=("Helvetica", 15, "bold"))
-		self.Label2.grid(row=5,column=4, padx= (int(15*new_w),int(0*new_w)), pady=(int(0*new_h),int(0*new_h)),sticky=S+E+W)
 
-		self.Label4 = Label(self.frame,text= "0",relief="ridge",borderwidth=2,anchor=E,font=("Helvetica", 15, "bold"))
-		self.Label4.grid(row=5,column=6, padx=(int(15*new_w),int(20*new_w)), pady=(int(0*new_h),int(0*new_h)))
+		self.Label4 = Label(self.frame,text= " Total Posts Labeled by {}: 0".format(User),relief="ridge",borderwidth=2,anchor=CENTER,font=("Helvetica", 10, "bold"))
+		self.Label4.grid(row=1,column=5, padx=(int(5*new_w),int(5*new_w)), pady=(int(25*new_h),int(5*new_h)),columnspan=1,sticky=E+W)
 
-		submit = Button(self.frame, text=" Submit ", command=self.submit, highlightbackground='#3E4149',anchor=CENTER)
+		submit = Button(self.frame, text=" Submit ", command=self.submit, highlightbackground='green2',anchor=CENTER)
 		# submit.grid(row=5,column=5, columnspan = 1, padx=(int(20*new_w),int(20*new_w)),pady=(int(20*new_h),int(20*new_h)))
-		submit.grid(row=6,column=5, columnspan = 1, padx=(int(20*new_w),int(20*new_w)),pady=(int(20*new_h),int(50*new_h)),sticky=S+E+W)
+		submit.grid(row=11,column=5, columnspan = 2, rowspan=2, padx=(int(25*new_w),int(25*new_w)),pady=(int(5*new_h),int(5*new_h)),sticky=N+S+E+W)
 
 		# forward = Button(self.frame, text=" Next ", command=self.clicked_next, highlightbackground='#3E4149',anchor=CENTER)
 		
 		
 
-		skip = Button(self.frame, text=" Next ", command=self.clicked_skip, highlightbackground='#3E4149',anchor=CENTER)
+		skip = Button(self.frame, text=" Next ", command=self.clicked_skip, highlightbackground='navy',anchor=CENTER)
 
-		skip.grid(row=6,column=1, padx=(int(5*new_w),int(5*new_w)), pady=(int(20*new_h),int(50*new_h)),sticky=S+E+W)
+		skip.grid(row=10,column=5, padx=(int(60*new_w),int(5*new_w)), pady=(int(5*new_h),int(5*new_h)),sticky=N+E+W)
 
-		delete = Button(self.frame, text="Delete", command=self.clicked_delete, highlightbackground='#3E4149',anchor=CENTER)
-		delete.grid(row=6,column=2, padx=(int(25*new_w),int(0*new_w)),pady=(int(20*new_h),int(50*new_h)),sticky=S+E+W)
+		delete = Button(self.frame, text="Delete", command=self.clicked_delete, highlightbackground='red2',anchor=CENTER)
+		delete.grid(row=10,column=6, padx=(int(5*new_w),int(70*new_w)),pady=(int(5*new_h),int(5*new_h)),sticky= N+E+W)
 
 		global blobs
 
 		self.completed = 0
+
 
 		self.count(0)
 
@@ -564,21 +579,10 @@ class API():
 window = Tk()
 
 def on_closing():
-	download_blob("log.json","log.json")
-
-	with open("log.json",'r') as ip:
-		data = json.load(ip)
-	# for key,value in data.items():
-	data[User] = ""
-	with open("log.json",'w+') as output: 
-		json.dump(data,output)
-
-	upload_blob("log.json","log.json","project_vaxx")
 	try:
 		os.remove("image.png")
 		os.remove("temp.json")
-		os.remove("temp2.json")
-		os.remove("log.json")
+		# os.remove("log.json")
 	except:
 		pass
 		
@@ -602,6 +606,8 @@ try:
 except:
 	pass
 
+window.title("Data Viewer")
+window.resizable(width=False, height=False)
 obj = API(window)
 window.protocol("WM_DELETE_WINDOW", on_closing)
 window.mainloop()
