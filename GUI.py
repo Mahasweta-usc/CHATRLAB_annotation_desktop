@@ -69,7 +69,7 @@ MisInf, Polarity, tag =  1,1,[]
 Ans1, Ans2, Ans3 = False, False, True
 
 storage_client = storage.Client.create_anonymous_client()
-bucket = storage_client.bucket(bucket_name="labeled_vaxx",user_project=None)
+bucket = storage_client.bucket(bucket_name="project_vaxx",user_project=None)
 
 org = bucket.list_blobs(prefix="201", delimiter=None)
 # blobs = iter(org)
@@ -90,19 +90,19 @@ temp_file = os.path.join(cwd,"temp.json")
 
 
 
-def upload_blob(source, destination_blob_name, bucket_name = "labeled_vaxx"):
+def upload_blob(source, destination_blob_name, bucket_name = "project_vaxx"):
 	bucket_t = storage_client.bucket(bucket_name, user_project=None)
 	temp = storage.Blob(destination_blob_name, bucket_t)
 
 	temp.upload_from_filename(source)
 
-def download_blob(source_blob_name, destination_file_name, bucket_name = "labeled_vaxx"):
+def download_blob(source_blob_name, destination_file_name, bucket_name = "project_vaxx"):
 	bucket_t = storage_client.bucket(bucket_name, user_project=None)
 	temp = storage.Blob(source_blob_name, bucket_t)
 
 	temp.download_to_filename(destination_file_name)
 
-def delete_blob(blob_name, bucket_name = "labeled_vaxx"):
+def delete_blob(blob_name, bucket_name = "project_vaxx"):
 	bucket_t = storage_client.bucket(bucket_name, user_project=None)
 	temp = storage.Blob(blob_name, bucket_t)
 	# # print('Blob {} deleted.'.format(temp))
@@ -110,7 +110,7 @@ def delete_blob(blob_name, bucket_name = "labeled_vaxx"):
 	name = "xxx-" + blob_name
 	blob = bucket_t.rename_blob(blob, name)
 
-def skip_blob(blob_name, bucket_name = "labeled_vaxx"):
+def skip_blob(blob_name, bucket_name = "project_vaxx"):
 	bucket_t = storage_client.bucket(bucket_name, user_project=None)
 	temp = storage.Blob(blob_name, bucket_t)
 	# # print('Blob {} deleted.'.format(temp))
@@ -204,7 +204,7 @@ class API():
 				data = json.load(json_file)
 
 			try:
-				print(data["Annotations"])
+				test = data["Annotations"]
 			except:
 				data["Annotations"] = {}
 
@@ -214,7 +214,7 @@ class API():
 				json.dump(data,write,indent=4)
 
 			upload_blob(temp_file,self.blob.name)
-			print(data["Annotations"][User])
+			# print(data["Annotations"][User])
 
 			self.completed += 1
 			# self.marked.append(self.blob.name)
@@ -286,10 +286,7 @@ class API():
 			self.blob = next(self.blobs)
 
 		else:
-			if self.completed >= org_len:
-				sys.stdout.write("All Annotations complete\n")
-			else:
-				sys.stdout.write("Files busy. Try Again Later")
+			sys.stdout.write("All Annotations complete\n")
 			on_closing()
 
 		try:
@@ -301,6 +298,7 @@ class API():
 			data2 = json.load(ip)
 
 		try:
+			test = data2["Annotations"][User]
 			self.completed += 1
 			blobs.pop(blobs.index(self.blob))
 			self.Update()
@@ -308,7 +306,7 @@ class API():
 			pass
 				
 		
-		# self.count(0)
+		self.count(0)
 		with open(temp_file,"r") as ip:
 			data = json.load(ip)
 		try:
