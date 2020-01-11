@@ -284,6 +284,7 @@ class API():
 
 		if blobs:
 			self.blob = next(self.blobs)
+			print(self.blob.name)
 
 		else:
 			sys.stdout.write("All Annotations complete\n")
@@ -302,6 +303,7 @@ class API():
 			self.completed += 1
 			blobs.pop(blobs.index(self.blob))
 			self.Update()
+			return
 		except:
 			pass
 				
