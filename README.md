@@ -1,6 +1,6 @@
 # Data Viewer
 
-Interactive Data visualizer for browsing/annotation for Instagram Vaccination Misinformation project. Requests information from Google cloud storage, stores updated Annotation responses.
+Interactive Tkinter Data visualizer for browsing/annotation for Instagram Vaccination Misinformation project. Requests information from Google cloud storage, stores updated Annotation responses.
 
 ## Getting Started
 
