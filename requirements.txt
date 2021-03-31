@@ -20,7 +20,7 @@ googleapis-common-protos==1.5.10
 httplib2==0.12.3
 idna==2.8
 jieba3k==0.35.1
-lxml==4.4.1
+lxml==4.6.3
 newspaper3k==0.2.8
 nltk==3.4.5
 Pillow==6.0.0
